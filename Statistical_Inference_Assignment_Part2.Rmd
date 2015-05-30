@@ -1,0 +1,48 @@
+---
+title: "Statistical Inference Assignment Part2"
+author: "Sharath G"
+---
+
+```{r global_options}
+    library(knitr)
+    library(ggplot2)
+    opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+Load and run summary statistics on the ToothGrowth dataset. We aim to understand whether increasing dosage or diets impact tooth growth. 
+
+```{r }
+library(datasets)
+head(ToothGrowth)
+str(ToothGrowth)
+ToothGrowth$dose <- factor(ToothGrowth$dose)
+ToothGrowth$supp <- factor(ToothGrowth$supp)
+```
+
+First, we perform exploratory analysis of the data to establish a link between our explanatory variables and tooth growth. Looking at the data below, it appears that OJ has a greater effect on tooth growth than VC. In addition, it appears as the dosage increases, tooth growth increases. 
+
+```{r}
+summary(ToothGrowth)
+library(ggplot2)
+ggplot(data=ToothGrowth, aes(x=dose, y=len) ) + geom_boxplot(aes(fill=dose))
+ggplot(data=ToothGrowth, aes(x=supp, y=len) ) + geom_boxplot(aes(fill=supp))
+```
+
+Now, we perform inferential analysis on the data to understand if these relationships hold up statitically. 
+
+First, let's look at the effect of diet on tooth growth. Taking the difference between sample means, we see that the 95% confidence interval includes 0. In addition, the p value is 6% which indicates that there is no significant difference in impacts between OJ and VC.   
+```{r}
+t.test(len ~ supp, data = ToothGrowth, paired = FALSE)
+```
+
+Now, let's look at the effect of dosage on tooth growth. Looking at the p values and the confidence intervals we can conclude that increasing dosage increases tooth growth.  
+```{r} 
+dose_0.5_1 <- ToothGrowth[ToothGrowth$dose %in% c(0.5, 1.0),] 
+dose_1.0_2 <- ToothGrowth[ToothGrowth$dose %in% c(2.0, 1.0),] 
+dose_0.5_2 <- ToothGrowth[ToothGrowth$dose %in% c(0.5, 2.0),] 
+t.test (len ~ dose, data = dose_0.5_1, paired= FALSE)
+t.test (len ~ dose, data = dose_1.0_2, paired= FALSE)
+t.test (len ~ dose, data = dose_0.5_2, paired= FALSE)
+```
+
+Based on the analysis we conclude that there is no significant impact of supp on tooth growth, although there is directional evidence that OJ has a stronger effect than VC. However, increasing dosage significantly increases tooth growth. 
